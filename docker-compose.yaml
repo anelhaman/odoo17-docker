@@ -1,0 +1,44 @@
+version: '3.2'
+services:
+  my-odoo:
+    image: odoo:17.0
+    container_name: odoo
+    depends_on:
+      - my-postgres
+    ports:
+      - "8069:8069"
+    environment:
+    - HOST=my-postgres
+    - USER=odoo
+    - PASSWORD=myodoo 
+    volumes:
+      # - ./odoo/entrypoint.sh:/entrypoint.sh
+      - ./odoo/addons:/mnt/extra-addons
+      - ./odoo/etc:/etc/odoo
+
+  my-postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres 
+      - POSTGRES_PASSWORD=myodoo
+      - POSTGRES_USER=odoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+    
+  my-pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    depends_on:
+      - my-postgres
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'rachen.phengsang@gmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'your_pgadmin_password' # <- replace to your new strong password
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
